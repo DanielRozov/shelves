@@ -1,0 +1,22 @@
+{
+  "name": "shelves",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/konkurenta/academy/shelves.git"
+  },
+  "keywords": [
+    "shelves"
+  ],
+  "author": "Daniel Rozov mKonkurenta",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/konkurenta/academy/shelves/issues"
+  },
+  "homepage": "https://gitlab.com/konkurenta/academy/shelves#readme"
+}

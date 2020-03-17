@@ -1,10 +1,13 @@
-const express = require('express');
+import { dbConnection } from './startup/db';
+import { routes } from './startup/routes';
+import express from 'express';
+
 const app = express();
+const port = process.env.PORT || 5000;
 
-require('./startup/routes')(app);
-require('./startup/db')();
+dbConnection();
+routes(app);
 
-const port = process.env.PORT || 3000;
 const server = app.listen(port, () => console.log(`Listening on port ${port}...`));
 
-module.exports = server;
+export default server;

@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-module.exports = function () {
+export function dbConnection() {
   mongoose.connect('mongodb://localhost/shelves', {
     useNewUrlParser: true,
     useUnifiedTopology: true,

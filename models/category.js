@@ -1,6 +1,6 @@
-const Joi = require('joi');
-const mongoose = require('mongoose');
-const { productSchema } = require('./product');
+import Joi  from 'joi';
+import mongoose from 'mongoose';
+import { productSchema } from './product';
 
 const Category = mongoose.model('Category', new mongoose.Schema({
   numberInStock: {

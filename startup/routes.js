@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 const app = express();
-const products = require('../routes/products');
+import products from '../routes/products';
 
 
-module.exports = function (app) {
+export function routes(app) {
   app.use(express.json());
   app.use('/api/shelves/categories/products', products);
 }

@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Joi = require('joi');
+import mongoose from 'mongoose';
+import Joi from 'joi';
 
 const productSchema = new mongoose.Schema({
   name: {
@@ -12,7 +12,7 @@ const productSchema = new mongoose.Schema({
 
 const Product = mongoose.model('Item', productSchema);
 
-function validateProduct(product) {
+export function validateProduct(product) {
   const schema = {
     name: Joi.string().min(3).max(50).required()
   }
@@ -20,6 +20,4 @@ function validateProduct(product) {
   return Joi.validate(product, schema);
 }
 
-exports.productSchema = productSchema;
-exports.Product = Product;
-exports.validate = validateProduct;
+export { productSchema, Product };

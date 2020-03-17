@@ -10,7 +10,7 @@ const router = express.Router();
 //   { name: "product3" }
 // ];
 
-router.get('/', async  (req, res) => {
+router.get('/', async (req, res) => {
   const products = await Product.find().sort('name');
   res.send(products);
 });
@@ -24,5 +24,17 @@ router.post('/', async (req, res) => {
 
   res.send(product);
 });
+
+router.put('/:id', async (req, res) => {
+  const { error } = validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  const product = await Product.findByIdAndUpdate(req.params.id, { name: req.body.name },
+    { new: true });
+
+    if(!product) return res.status(404).send('The product with the given ID was not found.');
+
+    res.send(product);
+  });
 
 module.exports = router;

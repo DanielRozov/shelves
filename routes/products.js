@@ -2,14 +2,7 @@ import { Product, validateProduct } from '../models/product';
 import express from 'express';
 import mongoose from 'mongoose';
 
-// const app = express();
 const router = express.Router();
-
-// const products = [
-//   { name: "product1" },
-//   { name: "product2" },
-//   { name: "product3" }
-// ];
 
 router.get('/', async (req, res) => {
   const products = await Product.find().sort('name').select({ name: 1 });
@@ -18,9 +11,10 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
 
-
   const { error } = validateProduct(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) {
+    return res.status(400).send(error.details[0].message);
+  }
 
   let product = new Product({ name: req.body.name });
   product = await product.save();
@@ -30,14 +24,20 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const { error } = validateProduct(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
+  if (error) {
+    return res.status(400).send(error.details[0].message);
+  }
   let product;
 
-  try {
-    product = await Product.find({ _id: req.params.id }).limit(1);
-  } catch (e) {
-    return res.status(404).json({ message: "This product does not exists" });
+  // try {
+  //   product = await Product.find({ _id: req.params.id }).limit(1);
+  // } catch (e) {
+  //   return res.status(404).json({ message: "This product does not exists" });
+  // }
+
+  product = await Product.findById(req.body.id);
+  if (!product) {
+    return res.status(400).send('Invalid product');
   }
 
   try {
@@ -53,7 +53,9 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const product = await Product.findByIdAndRemove(req.params.id);
 
-  if (!product) return res.status(404).send('The product with the given ID was not found.');
+  if (!product) {
+    return res.status(404).send('The product with the given ID was not found.');
+  }
 
   res.send(product);
 });
@@ -61,7 +63,9 @@ router.delete('/:id', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const product = await Product.findById(req.params.id);
 
-  if (!product) return res.status(404).send('The product with the given ID was not found');
+  if (!product) {
+    return res.status(404).send('The product with the given ID was not found');
+  }
 
   res.send(product);
 });

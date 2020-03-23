@@ -41,11 +41,6 @@ router.put('/:id', async (req, res) => {
     return res.status(404).json({ message: "This item does not exists" });
   }
 
-  // product = await Product.findById(req.body.id);
-  // if (!product) {
-  //   return res.status(400).send('Invalid product');
-  // }
-
   try {
     item = await Product.findByIdAndUpdate(req.params.id, { name: req.body.name },
       { new: true });

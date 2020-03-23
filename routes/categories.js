@@ -5,22 +5,6 @@ import mongoose from 'mongoose';
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-  try {
-    const category = await Category
-      .find({})
-      // .populate('-_id', 'item name -_id')
-      .select('item name')
-    if (!category) {
-      return res.status(404).send({ error: 'Not Found' });
-    }
-    console.log({ category });
-    res.send(category);
-  } catch (e) {
-    next(e);
-  }
-});
-
 router.post('/', async (req, res, next) => {
 
   let item;

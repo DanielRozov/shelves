@@ -1,23 +1,24 @@
 import mongoose from 'mongoose';
 import Joi from 'joi';
 
-const productSchema = new mongoose.Schema({
+const itemSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
     minlength: 3,
     maxlength: 50
   }
+
 });
 
-const Product = mongoose.model('Item', productSchema);
+const Item = mongoose.model('Item', itemSchema);
 
-export function validateProduct(product) {
+export function validateItem(item) {
   const schema = {
     name: Joi.string().min(3).max(50).required()
   }
 
-  return Joi.validate(product, schema);
+  return Joi.validate(item, schema);
 }
 
-export { productSchema, Product };
+export { itemSchema, Item };

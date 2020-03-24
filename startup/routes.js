@@ -1,8 +1,10 @@
 import express from 'express';
 const app = express();
+import bodyParser from 'body-parser'
 import items from '../routes/items';
 import categories from '../routes/categories';
-import shelves from '../routes/shelves'
+import shelves from '../routes/shelves';
+
 
 
 export function routes(app) {

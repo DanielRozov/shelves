@@ -4,6 +4,7 @@ import bodyParser from 'body-parser'
 import items from '../routes/items';
 import categories from '../routes/categories';
 import shelves from '../routes/shelves';
+import error from '../middleware/error';
 
 
 
@@ -15,7 +16,5 @@ export function routes(app) {
   app.use('/api/items', categories); // post, put and delete items
   app.use('/api/shelves/categories', shelves); // get (/:itemId) and get (/:categoryName/:itemId/)
 
-  app.use(function (err, req, res, next) {
-    return res.status(500).send('Something failed', ex);
-  });
+  app.use(error);
 }

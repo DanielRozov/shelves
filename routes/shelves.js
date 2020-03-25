@@ -1,16 +1,13 @@
 import express from 'express';
 import { Category } from '../models/category';
+import asyncMiddleware from '../middleware/async';
 
 const router = express.Router();
 
-router.get('/', async (req, res, next) => {
-  try {
-    const categories = await Category.find();
-    res.send(categories);
-  } catch (ex) {
-    next(ex);
-  }
-});
+router.get('/', asyncMiddleware(async (req, res) => {
+  const categories = await Category.find();
+  res.send(categories);
+}));
 
 router.get('/:categoryName', async (req, res) => {
   const { categoryName } = req.params;

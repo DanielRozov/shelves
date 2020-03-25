@@ -3,22 +3,17 @@ import { Category } from '../models/category';
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
   try {
     const categories = await Category.find();
     res.send(categories);
   } catch (ex) {
-    return res.status(500).send('Something failed', ex);
+    next(ex);
   }
 });
 
 router.get('/:categoryName', async (req, res) => {
   const { categoryName } = req.params;
-
-  console.log(categoryName);
-  if (!categoryName) {
-    return res.status(404).send(`The given category:  ${categoryName} does not exist.`);
-  }
 
   let items = [];
   try {
@@ -30,13 +25,13 @@ router.get('/:categoryName', async (req, res) => {
 
     res.send(items);
   } catch (e) {
-    return res.status(404).send('This shelve is empty or does not exist', e);
+    return res.status(404).send(`The given category does not exist.`);
   }
 });
 
 router.get('/:categoryName/:itemName', async (req, res) => {
   const { categoryName, itemName } = req.params;
- 
+
   let items = [];
   try {
     const category = await Category.find({ name: categoryName });

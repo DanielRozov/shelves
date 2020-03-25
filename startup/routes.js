@@ -14,4 +14,8 @@ export function routes(app) {
   app.use('/api/categories/items', items);  // post only items
   app.use('/api/items', categories); // post, put and delete items
   app.use('/api/shelves/categories', shelves); // get (/:itemId) and get (/:categoryName/:itemId/)
+
+  app.use(function (err, req, res, next) {
+    return res.status(500).send('Something failed', ex);
+  });
 }

@@ -4,6 +4,8 @@ import asyncMiddleware from '../middleware/async';
 
 const router = express.Router();
 
+// This endpoint is wrapped using an asyncMiddleware function 
+// to catch an error instead of try-catch block for experiment purposes.
 router.get('/', asyncMiddleware(async (req, res) => {
   const categories = await Category.find();
   res.send(categories);
@@ -15,6 +17,9 @@ router.get('/:categoryName', async (req, res) => {
   let items = [];
   try {
     const category = await Category.find({ name: categoryName });
+    if (!category) {
+      return res.status(404).send('The given category was not found');
+    }
 
     category.forEach((value) => {
       items.push(value.item.name);
@@ -22,7 +27,7 @@ router.get('/:categoryName', async (req, res) => {
 
     res.send(items);
   } catch (e) {
-    return res.status(404).send(`The given category does not exist.`);
+    return res.status(500).send('Something failed.', ex);
   }
 });
 
@@ -32,6 +37,9 @@ router.get('/:categoryName/:itemName', async (req, res) => {
   let items = [];
   try {
     const category = await Category.find({ name: categoryName });
+    if (!category) {
+      return res.status(404).send('The given category was not found');
+    }
 
     for (const product of category) {
       if (product.item.name === itemName) {
@@ -40,8 +48,8 @@ router.get('/:categoryName/:itemName', async (req, res) => {
     }
 
     res.send(items);
-  } catch (e) {
-    return res.status(404).send('The given item or category does not exist.', e);
+  } catch (ex) {
+    return res.status(500).send('Something failed.', ex);
   }
 });
 

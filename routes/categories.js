@@ -1,125 +1,88 @@
 import express from 'express';
 import { Category, validateCategory } from '../models/category';
 import { Item } from '../models/item';
-import mongoose from 'mongoose';
+import asyncMiddleware from '../middleware/async';
 
 const router = express.Router();
 
-router.post('/', async (req, res, next) => {
+router.post('/', asyncMiddleware(async (req, res, next) => {
+  const { name, itemId } = req.body;
 
-  let item;
-  try {
-    item = await Item.findById(req.body.itemId);
-  } catch (e) {
+  let item = await Item.findById(itemId);
+  if (!item) {
     return res.status(404).json({ message: "This product does not exists" });
   }
 
-  const { error } = validateCategory(req.body);
+  const { error } = validateCategory({ name, itemId });
   if (error) {
     return res.status(400).send(error.details[0].message);
   }
 
-  try {
-    let category = new Category({
-      name: req.body.name,  // it is possible to set for foot or hygiene
-      item: {
-        _id: item.id,
-        name: item.name
-      }
-    });
+  let category = new Category({
+    name: name,  // it is possible to set for foot or hygiene category
+    item: {
+      _id: item.id,
+      name: item.name
+    }
+  });
 
-    await category.save();
-    return res.status(201).send(category);
-  } catch (e) {
-    next(e)
-  }
-});
+  await category.save();
+  res.status(201).send(category);
+}));
 
 
-router.put('/:itemId', async (req, res) => {
-  const { error } = validateCategory(req.body);
+router.put('/:itemId', asyncMiddleware(async (req, res) => {
+  const { 'itemId': itemIdFromParams } = req.params;
+  const { name, itemId } = req.body;
+
+  const { error } = validateCategory({ name, itemId });
   if (error) {
     return res.status(400).send(error.details[0].message);
   }
 
-  let categoryFromParams;
-  try {
-    categoryFromParams = await findCategoryByItemIdOfAllCategories(req.params.itemId);
-    if (!categoryFromParams) {
-      return res.status(404), send('The category with the given was not found.');
-    }
-  } catch (e) {
-    if (e instanceof mongoose.Error.CastError) {
-      return res.status(400).send({ error: 'Not valid ID' });
-    } else {
-      return res.status(500).send({ error: 'Internal Error' });
-    }
+  let categoryFromParams = await SearchCategoryByProductId(itemIdFromParams);
+  if (!categoryFromParams) {
+    return res.status(404).json({ message: 'The category does not exist.' });
   }
 
-  let categoryFromBody;
-  try {
-    categoryFromBody = await findCategoryByItemIdOfAllCategories(req.body.itemId);
-    if (!categoryFromBody) {
-      return res.status(404).send('The item with the givsen id was not found');
-    }
-  } catch (e) {
-    if (e instanceof mongoose.Error.CastError) {
-      return res.status(400).send({ error: 'Not valid ID' });
-    } else {
-      return res.status(500).send({ error: 'Internal Error' });
-    }
+  let categoryFromBody = await SearchCategoryByProductId(itemId);
+  if (!categoryFromBody) {
+    return res.status(404).json({ message: 'The category does not exist.' });
   }
 
   const item = categoryFromBody.item;
-  try {
-    categoryFromBody = await Category.findByIdAndUpdate(categoryFromBody._id, {
-      name: req.body.name,  // it is possible to set for foot or hygiene
-      item: {
-        _id: item.id,
-        name: item.name
-      }
-    }, { new: true });
-
-    if (!categoryFromBody) {
-      return res.status(404).send('The category with the given ID was not found.');
-
-      res.send(categoryFromBody);
+  categoryFromParams = await Category.findByIdAndUpdate(categoryFromParams._id, {
+    name: name,  // it is possible to set for foot or hygiene
+    item: {
+      _id: item.id,
+      name: item.name
     }
-  } catch (e) {
-    if (e instanceof mongoose.Error.CastError) {
-      return res.status(400).send({ error: 'Not valid ID' });
-    } else {
-      return res.status(500).send({ error: 'Internal Error' });
-    }
+  }, { new: true });
+
+  if (!categoryFromParams) {
+    return res.status(404).json({ message: 'The category does not exist.' });
   }
-});
 
-router.delete('/:itemId', async (req, res, next) => {
-  let category
-  try {
-    category = await findCategoryByItemIdOfAllCategories(req.params.itemId);
-    category = await Category.findByIdAndRemove(category._id);
-    
-    if (!category) {
-      return res.status(404).send('The item with the given ID was not found');
-    }
+  res.send(categoryFromParams);
+}));
 
-    res.send({ category });
-  } catch (e) {
-    if (e instanceof mongoose.Error.CastError) {
-      return res.status(400).send({ error: 'Not valid ID' });
-    } else {
-      return res.status(500).send({ error: 'Internal Error' });
-    }
+router.delete('/:itemId', asyncMiddleware(async (req, res) => {
+  const { itemId } = req.params;
+
+  let category = await SearchCategoryByProductId(itemId);
+  if (!category) {
+    return res.status(404).json({ message: 'The category does not exist.' });
   }
-});
+  category = await Category.findByIdAndRemove(category._id);
+
+  res.send( category );
+}));
 
 // Helper method. 
 // Searches for all categories: food and hygiene for a given itemId 
 // and returns category
-async function findCategoryByItemIdOfAllCategories(itemId) {
-  const names = await Category
-    .aggregate([{ $match: { 'name': { $regex: /^(food|hygiene)$/ } } }]);
+async function SearchCategoryByProductId(itemId) {
+  const names = await Category.find();
 
   let category;
   names.forEach((c) => {

@@ -27,7 +27,6 @@ router.post('/', asyncMiddleware(async (req, res) => {
   }
 
   const token = jwt.sign({ _id: user._id }, config.get('jwtPrivateKey'), { expiresIn: 5 * 60 });
-
   res.send(token);
 }));
 

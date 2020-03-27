@@ -1,6 +1,8 @@
 import { User } from '../models/user';
 import validateUser from '../models/user';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import config from 'config';
 import express from 'express';
 import asyncMiddleware from '../middleware/async';
 
@@ -27,10 +29,10 @@ router.post('/', asyncMiddleware(async (req, res) => {
   user = new User({ username, email, password });
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(password, salt);
-
   await user.save();
 
-  res.send({ username, email });
+  const token = jwt.sign({ _id: user._id }, config.get('jwtPrivateKey'), { expiresIn: 5 * 60 });
+  res.header('x-auth-token', token).send({ username, email });
 }));
 
 router.put('/:id', asyncMiddleware(async (req, res) => {

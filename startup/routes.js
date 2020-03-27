@@ -3,6 +3,7 @@ import express from 'express';
 import items from '../routes/items';
 import categories from '../routes/categories';
 import shelves from '../routes/shelves';
+import users from '../routes/users'
 
 
 export function routes(app) {
@@ -12,6 +13,7 @@ export function routes(app) {
   app.use('/api/categories/items', items);  // post only items
   app.use('/api/items', categories); // post, put and delete items
   app.use('/api/shelves/categories', shelves); // get (/:itemId) and get (/:categoryName/:itemId/)
+  app.use('/api/users', users);
 
   app.use(error);
 }

@@ -1,6 +1,7 @@
 import { User } from '../models/user';
 import Joi from 'joi';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import express from 'express';
 import asyncMiddleware from '../middleware/async';
 const router = express.Router();
@@ -24,7 +25,9 @@ router.post('/', asyncMiddleware(async (req, res) => {
     return res.status(400).json({ message: 'Invalid email or password.' })
   }
 
-  res.send(true);
+  const token = jwt.sign({ _id: user._id }, 'jetPrivateKey', { expiresIn: 5 * 60 });
+
+  res.send(token);
 }));
 
 function validate(req) {

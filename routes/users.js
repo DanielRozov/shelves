@@ -1,5 +1,4 @@
-import { User } from '../models/user';
-import validateUser from '../models/user';
+import { User, validateUser } from '../models/user';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import config from 'config';
@@ -31,15 +30,15 @@ router.post('/', asyncMiddleware(async (req, res) => {
   user.password = await bcrypt.hash(password, salt);
   await user.save();
 
-  const token = jwt.sign({ _id: user._id }, config.get('jwtPrivateKey'), { expiresIn: 5 * 60 });
+  const token = jwt.sign({ _id: user._id }, config.get('jwtPrivateKey'), { expiresIn: '1h' });
   res.header('x-auth-token', token).send({ username, email });
 }));
 
 router.put('/:id', asyncMiddleware(async (req, res) => {
-  const { username, email } = req.body;
+  const { username, email, password } = req.body;
   const { id } = req.params;
 
-  const { error } = validateUser({ username, email });
+  const { error } = validateUser({ username, email, password });
   if (error) {
     return res.status(400).send(error.details[0].message);
   }
@@ -49,10 +48,10 @@ router.put('/:id', asyncMiddleware(async (req, res) => {
     return res.status(404).json({ message: 'This user does not exist.' });
   }
 
-  user = await User.findByIdAndUpdate(id, { username, email },
+  user = await User.findByIdAndUpdate(id, { username, email, password },
     { new: true });
 
-  res.send(user);
+  res.send({ user });
 }));
 
 

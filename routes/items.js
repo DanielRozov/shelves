@@ -11,6 +11,7 @@ router.get('/', asyncMiddleware(async (req, res) => {
 }));
 
 router.post('/', asyncMiddleware(async (req, res) => {
+  
   const { name } = req.body;
 
   const { error } = validateItem(req.body);

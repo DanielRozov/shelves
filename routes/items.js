@@ -3,6 +3,7 @@ import { Item } from '../models/item';
 import validateItem from '../models/item';
 import express from 'express';
 import asyncMiddleware from '../middleware/async';
+import admin from '../middleware/admin';
 
 const router = express.Router();
 
@@ -44,7 +45,7 @@ router.put('/:id', auth, asyncMiddleware(async (req, res) => {
   res.send(item);
 }));
 
-router.delete('/:id',auth,  asyncMiddleware(async (req, res) => {
+router.delete('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
   const { id } = req.params;
 
   let item = await Item.find({ _id: id }).limit(1);

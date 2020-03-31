@@ -11,25 +11,21 @@ router.get('/', asyncMiddleware(async (req, res) => {
   res.send(categories);
 }));
 
-router.get('/:categoryName', async (req, res) => {
+router.get('/:categoryName', asyncMiddleware(async (req, res) => {
   const { categoryName } = req.params;
 
   let items = [];
-  try {
-    const category = await Category.find({ name: categoryName });
-    if (!category) {
-      return res.status(404).send('The given category was not found');
-    }
-
-    category.forEach((value) => {
-      items.push(value.item.name);
-    });
-
-    res.send(items);
-  } catch (e) {
-    return res.status(500).send('Something failed.', ex);
+  const category = await Category.find({ name: categoryName });
+  if (!category) {
+    return res.status(404).send('The given category was not found');
   }
-});
+
+  category.forEach((value) => {
+    items.push(value.item.name);
+  });
+
+  res.send(items);
+}));
 
 router.get('/:categoryName/:itemName', async (req, res) => {
   const { categoryName, itemName } = req.params;

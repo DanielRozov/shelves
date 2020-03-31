@@ -9,7 +9,7 @@ const router = express.Router();
 
 
 router.post('/', asyncMiddleware(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, isAdmin } = req.body;
 
   const { error } = validate({ email, password });
   if (error) {
@@ -26,7 +26,7 @@ router.post('/', asyncMiddleware(async (req, res) => {
     return res.status(400).json({ message: 'Invalid email or password.' })
   }
 
-  const token = jwt.sign({ _id: user._id }, config.get('jwtPrivateKey'), { expiresIn: '1h' });
+  const token = jwt.sign({ _id: user._id, isAdmin: user.isAdmin }, config.get('jwtPrivateKey'), { expiresIn: '1h' });
   res.send(token);
 }));
 

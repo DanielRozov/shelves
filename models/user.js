@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Joi from 'joi';
+import Joi, { bool, boolean } from 'joi';
 import jwt from 'jsonwebtoken'
 
 const userSchema = new mongoose.Schema({
@@ -21,7 +21,8 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 5,
     maxlength: 1014
-  }
+  },
+  isAdmin: Boolean
 
 });
 

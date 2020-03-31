@@ -14,9 +14,9 @@ router.get('/', asyncMiddleware(async (req, res) => {
 }));
 
 router.post('/', auth, asyncMiddleware(async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, isAdmin } = req.body;
 
-  const { error } = validateUser({ username, email, password });
+  const { error } = validateUser({ username, email, password, isAdmin });
   if (error) {
     return res.status(400).send(error.details[0].message);
   }
@@ -26,13 +26,13 @@ router.post('/', auth, asyncMiddleware(async (req, res) => {
     return res.status(400).json({ message: 'User already registred.' })
   }
 
-  user = new User({ username, email, password });
+  user = new User({ username, email, password, isAdmin });
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(password, salt);
   await user.save();
 
-  const token = jwt.sign({ _id: user._id }, config.get('jwtPrivateKey'), { expiresIn: '1h' });
-  res.header('x-auth-token', token).send({ username, email });
+  const token = jwt.sign({ _id: user._id, isAdmin: user.isAdmin }, config.get('jwtPrivateKey'), { expiresIn: '1h' });
+  res.header('x-auth-token', token).send({ username, email, isAdmin });
 }));
 
 router.put('/:id', auth, asyncMiddleware(async (req, res) => {

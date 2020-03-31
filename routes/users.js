@@ -1,3 +1,4 @@
+import auth from '../middleware/auth'
 import { User, validateUser } from '../models/user';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -12,7 +13,7 @@ router.get('/', asyncMiddleware(async (req, res) => {
   res.send(users);
 }));
 
-router.post('/', asyncMiddleware(async (req, res) => {
+router.post('/', auth, asyncMiddleware(async (req, res) => {
   const { username, email, password } = req.body;
 
   const { error } = validateUser({ username, email, password });
@@ -34,7 +35,7 @@ router.post('/', asyncMiddleware(async (req, res) => {
   res.header('x-auth-token', token).send({ username, email });
 }));
 
-router.put('/:id', asyncMiddleware(async (req, res) => {
+router.put('/:id', auth, asyncMiddleware(async (req, res) => {
   const { username, email, password } = req.body;
   const { id } = req.params;
 
@@ -55,7 +56,7 @@ router.put('/:id', asyncMiddleware(async (req, res) => {
 }));
 
 
-router.delete('/:id', asyncMiddleware(async (req, res) => {
+router.delete('/:id', auth, asyncMiddleware(async (req, res) => {
   const { id } = req.params;
 
   let user = await User.find({ _id: id }).limit(1);

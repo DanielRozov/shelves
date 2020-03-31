@@ -1,3 +1,4 @@
+import auth from '../middleware/auth';
 import { Item } from '../models/item';
 import validateItem from '../models/item';
 import express from 'express';
@@ -10,7 +11,7 @@ router.get('/', asyncMiddleware(async (req, res) => {
   res.send(items);
 }));
 
-router.post('/', asyncMiddleware(async (req, res) => {
+router.post('/', auth, asyncMiddleware(async (req, res) => {
   const { name } = req.body;
 
   const { error } = validateItem(req.body);
@@ -24,7 +25,7 @@ router.post('/', asyncMiddleware(async (req, res) => {
   res.send(item);
 }));
 
-router.put('/:id', asyncMiddleware(async (req, res) => {
+router.put('/:id', auth, asyncMiddleware(async (req, res) => {
   const { name } = req.body;
   const { id } = req.params;
 
@@ -43,7 +44,7 @@ router.put('/:id', asyncMiddleware(async (req, res) => {
   res.send(item);
 }));
 
-router.delete('/:id', asyncMiddleware(async (req, res) => {
+router.delete('/:id',auth,  asyncMiddleware(async (req, res) => {
   const { id } = req.params;
 
   let item = await Item.find({ _id: id }).limit(1);

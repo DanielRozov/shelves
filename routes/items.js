@@ -7,11 +7,23 @@ import admin from '../middleware/admin';
 
 const router = express.Router();
 
+/**
+ * @api {get} / Request Items information
+ * @apiName GetItems
+ * @apiGroup Item 
+ */
 router.get('/', asyncMiddleware(async (req, res) => {
   const items = await Item.find();
   res.send(items);
 }));
 
+/**
+ * @api {post} / 
+ * @apiParam {String} name 
+ * @apiError "name" is requires
+ * @apiParam () Only logged in users can post this.
+ * 
+ */
 router.post('/', auth, asyncMiddleware(async (req, res) => {
   const { name } = req.body;
 
@@ -26,6 +38,17 @@ router.post('/', auth, asyncMiddleware(async (req, res) => {
   res.send(item);
 }));
 
+/**
+ * @api {put} /:id 
+ * @apiParam {Number} id Item unique ID 
+ * @apiError "name" is requires
+ * @apiErrorExample {json} Error-Response:
+ *        HTTP/1.1 404
+ *        {
+ *          "error": "This product does not exist."
+ *        }
+ * @apiParam () Only logged in users can put this.
+ */
 router.put('/:id', auth, asyncMiddleware(async (req, res) => {
   const { name } = req.body;
   const { id } = req.params;
@@ -45,6 +68,16 @@ router.put('/:id', auth, asyncMiddleware(async (req, res) => {
   res.send(item);
 }));
 
+/**
+ * @api {delete} /:id 
+ * @apiParam {Number} id Item unique ID 
+ * @apiErrorExample {json} Error-Response:
+ *        HTTP/1.1 404
+ *        {
+ *          "error": "This product does not exist."
+ *        }
+ * @apiParam () Only logged in admin can delete this.
+ */
 router.delete('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
   const { id } = req.params;
 
@@ -57,6 +90,15 @@ router.delete('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
   res.send(item);
 }));
 
+/**
+ * @api {get} /:id 
+ * @apiParam {Number} id Item unique ID 
+ * @apiErrorExample {json} Error-Response:
+ *        HTTP/1.1 404
+ *        {
+ *          "error": "This product does not exist."
+ *        }
+ */
 router.get('/:id', asyncMiddleware(async (req, res) => {
   const { id } = req.params;
 

@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import config from 'config';
 import express from 'express';
 import asyncMiddleware from '../middleware/async';
+import admin from '../middleware/admin';
 
 const router = express.Router();
 
@@ -13,10 +14,10 @@ router.get('/', asyncMiddleware(async (req, res) => {
   res.send(users);
 }));
 
-router.post('/', auth, asyncMiddleware(async (req, res) => {
+router.post('/', asyncMiddleware(async (req, res) => {
   const { username, email, password, isAdmin } = req.body;
 
-  const { error } = validateUser({ username, email, password, isAdmin });
+  const { error } = validateUser({ username, email, password });
   if (error) {
     return res.status(400).send(error.details[0].message);
   }
@@ -56,7 +57,7 @@ router.put('/:id', auth, asyncMiddleware(async (req, res) => {
 }));
 
 
-router.delete('/:id', auth, asyncMiddleware(async (req, res) => {
+router.delete('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
   const { id } = req.params;
 
   let user = await User.find({ _id: id }).limit(1);

@@ -3,17 +3,18 @@ import express from 'express';
 import { Category, validateCategory } from '../models/category';
 import { Item } from '../models/item';
 import asyncMiddleware from '../middleware/async';
+import admin from '../middleware/admin';
 
 const router = express.Router();
 
-router.post('/', auth, asyncMiddleware(async (req, res, next) => {
+router.post('/', [auth, admin], asyncMiddleware(async (req, res, next) => {
   const { name, itemId } = req.body;
 
   const { error } = validateCategory({ name, itemId });
   if (error) {
     return res.status(400).send(error.details[0].message);
   }
-  
+
   let item = await Item.findById(itemId);
   if (!item) {
     return res.status(404).json({ message: "This product does not exists" });
@@ -32,7 +33,7 @@ router.post('/', auth, asyncMiddleware(async (req, res, next) => {
 }));
 
 
-router.put('/:itemId', auth, asyncMiddleware(async (req, res) => {
+router.put('/:itemId', [auth, admin], asyncMiddleware(async (req, res) => {
   const { 'itemId': itemIdFromParams } = req.params;
   const { name, itemId } = req.body;
 
@@ -67,7 +68,7 @@ router.put('/:itemId', auth, asyncMiddleware(async (req, res) => {
   res.send(categoryFromParams);
 }));
 
-router.delete('/:itemId', auth, asyncMiddleware(async (req, res) => {
+router.delete('/:itemId', [auth, admin], asyncMiddleware(async (req, res) => {
   const { itemId } = req.params;
 
   let category = await SearchCategoryByProductId(itemId);

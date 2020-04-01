@@ -11,7 +11,7 @@ router.get('/', asyncMiddleware(async (req, res) => {
   res.send(categories);
 }));
 
-router.get('/:categoryName', asyncMiddleware(async (req, res) => {
+router.get('/categories/:categoryName', asyncMiddleware(async (req, res) => {
   const { categoryName } = req.params;
 
   let items = [];
@@ -27,7 +27,7 @@ router.get('/:categoryName', asyncMiddleware(async (req, res) => {
   res.send(items);
 }));
 
-router.get('/:categoryName/:itemName', async (req, res) => {
+router.get('/categories/:categoryName/:itemName', async (req, res) => {
   const { categoryName, itemName } = req.params;
 
   let items = [];

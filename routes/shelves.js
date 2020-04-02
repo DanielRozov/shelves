@@ -6,11 +6,20 @@ const router = express.Router();
 
 // This endpoint is wrapped using an asyncMiddleware function 
 // to catch an error instead of try-catch block for experiment purposes.
+/**
+ * @api {get} / Request AllCategories information
+ * @apiName GetAllCategories
+ * @apiGroup Categorie
+ */
 router.get('/', asyncMiddleware(async (req, res) => {
   const categories = await Category.find();
   res.send(categories);
 }));
 
+/**
+ * @api {get} /categories/:categoryName Request Category information
+ * @apiParam {String} categoryName: food or hygiene
+ */
 router.get('/categories/:categoryName', asyncMiddleware(async (req, res) => {
   const { categoryName } = req.params;
 
@@ -27,6 +36,11 @@ router.get('/categories/:categoryName', asyncMiddleware(async (req, res) => {
   res.send(items);
 }));
 
+/**
+ * @api {get} /categories/:categoryName/:itemName Request GetAllItemsByItemName information
+ * @apiParam {String} categoryName: food or hygiene
+ * @apiParam {String} itemName
+ */
 router.get('/categories/:categoryName/:itemName', async (req, res) => {
   const { categoryName, itemName } = req.params;
 

@@ -9,11 +9,22 @@ import admin from '../middleware/admin';
 
 const router = express.Router();
 
+/**
+ * @api {get} / Request Users information
+ * @apiName GetUsers
+ * @apiGroup User
+ */
 router.get('/', asyncMiddleware(async (req, res) => {
   const users = await User.find();
   res.send(users);
 }));
 
+/**
+ * @api {post} / 
+ * @apiParam {String} username
+ * @apiParam {String} email
+ * @apiParam {String} password
+ */
 router.post('/', asyncMiddleware(async (req, res) => {
   const { username, email, password, isAdmin } = req.body;
 
@@ -36,6 +47,11 @@ router.post('/', asyncMiddleware(async (req, res) => {
   res.header('x-auth-token', token).send({ username, email, isAdmin });
 }));
 
+/**
+ * @api {put} /:id
+ * @apiParam {Number} id User unique ID
+ * @apiPermission Only logged in users can put this.
+ */
 router.put('/:id', auth, asyncMiddleware(async (req, res) => {
   const { username, email, password } = req.body;
   const { id } = req.params;
@@ -56,7 +72,11 @@ router.put('/:id', auth, asyncMiddleware(async (req, res) => {
   res.send({ user });
 }));
 
-
+/**
+ * @api {delete} /:id
+ * @apiParam {Number} id User unique ID
+ * @apiPermission Only logged in admin can delete this.
+ */
 router.delete('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
   const { id } = req.params;
 
@@ -70,6 +90,10 @@ router.delete('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
   res.send(user);
 }));
 
+/**
+ * @api {get} /:id Request User by ID information
+ * @apiParam {Number} id User unique ID
+ */
 router.get('/:id', asyncMiddleware(async (req, res) => {
   const { id } = req.params;
 

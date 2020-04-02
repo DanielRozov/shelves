@@ -7,6 +7,16 @@ import admin from '../middleware/admin';
 
 const router = express.Router();
 
+/**
+ * @api {post} / 
+ * @apiName HandleCategories
+ * @apiParam {String} name 
+ * @apiParam {String} itemId
+ * @apiError name is requires
+ * @apiError itemId is requires
+ * @apiPermission Only logged in admin can post this.
+ * 
+ */
 router.post('/', [auth, admin], asyncMiddleware(async (req, res, next) => {
   const { name, itemId } = req.body;
 
@@ -32,7 +42,14 @@ router.post('/', [auth, admin], asyncMiddleware(async (req, res, next) => {
   res.status(201).send(category);
 }));
 
-
+/**
+ * @api {put} /:itemId
+ * @apiParam {Number} id Item unique ID 
+ * @apiError name is requires
+ * @apiError itemId is requires
+ * 
+ * @apiPermission Only logged in admin can put this.
+ */
 router.put('/:itemId', [auth, admin], asyncMiddleware(async (req, res) => {
   const { 'itemId': itemIdFromParams } = req.params;
   const { name, itemId } = req.body;
@@ -68,6 +85,14 @@ router.put('/:itemId', [auth, admin], asyncMiddleware(async (req, res) => {
   res.send(categoryFromParams);
 }));
 
+/**
+ * @api {delete} /:itemId
+ * @apiParam {Number} id Item unique ID 
+ * @apiError name is requires
+ * @apiError itemId is requires
+ * 
+ * @apiPermission Only logged in admin can delete this.
+ */
 router.delete('/:itemId', [auth, admin], asyncMiddleware(async (req, res) => {
   const { itemId } = req.params;
 
@@ -80,8 +105,8 @@ router.delete('/:itemId', [auth, admin], asyncMiddleware(async (req, res) => {
   res.send(category);
 }));
 
-// Helper method. 
-// Searches for all categories: food and hygiene for a given itemId 
+// Helper method, that
+// searches for all categories: food and hygiene for a given itemId 
 // and returns category
 async function SearchCategoryByProductId(itemId) {
   const names = await Category.find();

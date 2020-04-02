@@ -20,8 +20,8 @@ router.get('/', asyncMiddleware(async (req, res) => {
 /**
  * @api {post} / 
  * @apiParam {String} name 
- * @apiError "name" is requires
- * @apiParam () Only logged in users can post this.
+ * @apiError name is requires
+ * @apiPermission Only logged in users can post this.
  * 
  */
 router.post('/', auth, asyncMiddleware(async (req, res) => {
@@ -41,13 +41,13 @@ router.post('/', auth, asyncMiddleware(async (req, res) => {
 /**
  * @api {put} /:id 
  * @apiParam {Number} id Item unique ID 
- * @apiError "name" is requires
+ * @apiError name is requires
  * @apiErrorExample {json} Error-Response:
  *        HTTP/1.1 404
  *        {
  *          "error": "This product does not exist."
  *        }
- * @apiParam () Only logged in users can put this.
+ * @apiPermission Only logged in users can put this.
  */
 router.put('/:id', auth, asyncMiddleware(async (req, res) => {
   const { name } = req.body;
@@ -76,7 +76,7 @@ router.put('/:id', auth, asyncMiddleware(async (req, res) => {
  *        {
  *          "error": "This product does not exist."
  *        }
- * @apiParam () Only logged in admin can delete this.
+ * @apiPermission Only logged in admin can delete this.
  */
 router.delete('/:id', [auth, admin], asyncMiddleware(async (req, res) => {
   const { id } = req.params;

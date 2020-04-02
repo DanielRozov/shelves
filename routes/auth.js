@@ -7,7 +7,16 @@ import express from 'express';
 import asyncMiddleware from '../middleware/async';
 const router = express.Router();
 
-
+/**
+ * @api {post} / 
+ * @apiName Auth
+ * @apiParam {String} email
+ * @apiParam {String} password
+ * @apiParam {Boolean} isAdmin: true/false  
+ * @apiError email is required
+ * @apiError password is required
+ * @apiError isAdmin is required
+ */
 router.post('/', asyncMiddleware(async (req, res) => {
   const { email, password, isAdmin } = req.body;
 

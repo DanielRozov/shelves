@@ -1,10 +1,10 @@
 import error from '../middleware/error'
 import express from 'express';
-import items from '../routes/items';
-import categories from '../routes/categories';
-import shelves from '../routes/shelves';
-import users from '../routes/users';
-import auth from '../routes/auth'
+import items from '../services/items';
+import categories from '../services/categories';
+import shelves from '../services/shelves';
+import users from '../services/user.service';
+import auth from '../services/auth'
 
 
 export function routes(app) {

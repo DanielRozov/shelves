@@ -7,6 +7,12 @@ export function dbConnection() {
     useFindAndModify: false,
     useCreateIndex: true,
   })
-    .then(() => console.log('Connected to MongoDB...'))
-    .catch(err => console.error('Could not connect to MongoDB...', err));
+    .then(() => {
+      console.log('Connected to MongoDB...')
+      return true;
+    })
+    .catch(err => {
+      console.error('Could not connect to MongoDB...', err)
+      throw err;
+    });
 }

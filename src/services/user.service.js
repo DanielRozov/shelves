@@ -1,14 +1,8 @@
-import auth from '../middleware/auth'
-import { User, validateUser, userSchema } from '../models/user';
+import { User, validateUser } from '../models/user';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import config from 'config';
-import express from 'express';
-import asyncMiddleware from '../middleware/async';
-import admin from '../middleware/admin';
-import httpStatus from 'http-status'
-
-const router = express.Router();
+import httpStatus from 'http-status';
 
 /**
  * @api {get} /api/users Request Users information
@@ -61,20 +55,22 @@ export async function getAllUsers() {
  * @apiErrorExample {json} Error-Response:
  *     HTTP/1.1 400 Bad Request
  *     {
- *        "message": "User already registred."
+ *        "message": "User allready registred."
  *     }
  */
 export async function createUser(req, res) {
-  const { username, email, password, isAdmin } = req;
+  const { username, email, password, isAdmin } = req.body;
 
   const { error } = validateUser({ username, email, password, isAdmin });
   if (error) {
-    return res.status(400).send(error.details[0].message);
+    return res.status(httpStatus.BAD_REQUEST).send(error.details[0].message);
   }
 
   let user = await User.findOne({ email });
   if (user) {
-    return res.status(400).json({ message: 'User already registred.' })
+    return res
+      .status(httpStatus.BAD_REQUEST)
+      .json({ status: httpStatus.BAD_REQUEST, message: 'User allready registred.' })
   }
 
   user = new User({ username, email, password, isAdmin });
@@ -123,18 +119,22 @@ export async function updateUseById(req, res) {
 
   const { error } = validateUser({ username, email, password });
   if (error) {
-    return res.status(400).send(error.details[0].message);
+    return res
+      .status(httpStatus.BAD_REQUEST)
+      .send(error.details[0].message);
   }
 
   let user = await User.find({ _id: id }).limit(1);
-  if (!user) {
-    return res.status(404).json({ message: 'This user does not exist.' });
+  if (!user || user.length === 0) {
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .json({ status: httpStatus.NOT_FOUND, message: 'This user does not exist.' });
   }
 
   user = await User.findByIdAndUpdate(id, { username, email, password },
     { new: true });
 
-  res.send(user);
+  return user;
 };
 
 /**
@@ -158,7 +158,6 @@ export async function updateUseById(req, res) {
  *      "isAdmin": "true/false"
  *    }
  * 
- 
  * @apiErrorExample Forbidden:
  *     HTTP/1.1 403 Forbidden
  *     {
@@ -169,17 +168,18 @@ export async function deleteUserById(req, res) {
   const { id } = req.params;
 
   let user = await User.find({ _id: id }).limit(1);
-  if (!user) {
-    return res.status(404).json({ message: 'This user does not exist.' });
+  if (!user || user.length === 0) {
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .json({ status: httpStatus.NOT_FOUND, message: 'This user does not exist.' });
   }
 
   user = await User.findByIdAndRemove({ _id: id });
-
-  res.send(user);
+  return user;
 };
 
 /**
- * @api {get} /api/user/:id Read data of a User
+ * @api {get} /api/users/:id Read data of a User
  * @apiName GetUser
  * @apiGroup User
  * @apiPermission Authorized
@@ -205,11 +205,11 @@ export async function getUserById(req, res) {
   const { id } = req.params;
 
   let user = await User.find({ _id: id }).limit(1);
-  if (!user) {
-    return res.status(404).json({ message: 'This user does not exist.' });
+  if (!user || user.length === 0) {
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .json({ status: httpStatus.NOT_FOUND, message: 'This user does not exist.' });
   }
 
-  res.send(user);
+  return user;
 };
-
-// export default router;

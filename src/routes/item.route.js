@@ -1,23 +1,25 @@
-import { getUsers, postUser, getUser, updateUser, deleteUser } from '../controllers/user.controller';
+import { getItems, postItem, getItem, deleteItem, putItem } from '../controllers/item.controller'
 import express from 'express';
 import auth from '../middleware/auth';
 import admin from '../middleware/admin';
 
 const routes = (app) => {
-  app
-    .use(express.json())
-    .use(express.urlencoded({ extended: true }))
-    .route('/api/users')
-    .post(postUser)
-    .get(getUsers)
 
   app
     .use(express.json())
     .use(express.urlencoded({ extended: true }))
-    .route('/api/users/:id')
-    .get(getUser)
-    .put([auth, admin], updateUser)
-    .delete([auth, admin], deleteUser)
+    .route('/api/items')
+    .get(getItems)
+    .post(postItem)
+
+  app
+    .use(express.json())
+    .use(express.urlencoded({ extended: true }))
+    .route('/api/items/:id')
+    .get(getItem)
+    .put(putItem)
+    .delete(deleteItem)
 }
+
 
 export default routes;

@@ -1,6 +1,6 @@
 import { dbConnection } from './startup/db';
 // import { routes } from './startup/routes';
-import routes from './routes/user.route'
+import { itemRoute, userRoute } from './routes/index'
 import express from 'express';
 import config from 'config';
 import nodeApiDocGenerator from 'node-api-doc-generator';
@@ -14,7 +14,8 @@ if (!config.get('jwtPrivateKey')) {
 }
 
 dbConnection();
-routes(app);
+itemRoute(app);
+userRoute(app);
 
 const server = app.listen(port, () => console.log(`Listening on port ${port}...`));
 nodeApiDocGenerator(app, 'shelves', port);

@@ -4,30 +4,37 @@ import { Category, validateCategory } from '../models/category';
 import { Item } from '../models/item';
 import asyncMiddleware from '../middleware/async';
 import admin from '../middleware/admin';
+import httpStatus from 'http-status'
 
 const router = express.Router();
 
 /**
- * @api {post} / 
- * @apiName HandleCategories
+ * @api {post} /api/categories
+ * @apiName postCategory
+ * @apiGroup Category
+ * 
  * @apiParam {String} name 
  * @apiParam {String} itemId
+ * 
  * @apiError name is requires
  * @apiError itemId is requires
+ * 
  * @apiPermission Only logged in admin can post this.
  * 
  */
-router.post('/', [auth, admin], asyncMiddleware(async (req, res, next) => {
+export async function createCategory(req, res) {
   const { name, itemId } = req.body;
 
   const { error } = validateCategory({ name, itemId });
   if (error) {
-    return res.status(400).send(error.details[0].message);
+    return res.status(httpStatus.BAD_REQUEST).send(error.details[0].message);
   }
 
   let item = await Item.findById(itemId);
   if (!item) {
-    return res.status(404).json({ message: "This product does not exists" });
+    return res
+      .status(httpStatus.NOT_FOUND)
+      .json({ status: httpStatus.NOT_FOUND, message: "This product does not exists" });
   }
 
   let category = new Category({
@@ -39,8 +46,9 @@ router.post('/', [auth, admin], asyncMiddleware(async (req, res, next) => {
   });
 
   await category.save();
-  res.status(201).send(category);
-}));
+  return category;
+  // res.status(201).send(category);
+};
 
 /**
  * @api {put} /:itemId

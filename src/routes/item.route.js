@@ -10,15 +10,15 @@ const routes = (app) => {
     .use(express.urlencoded({ extended: true }))
     .route('/api/items')
     .get(getItems)
-    .post(postItem)
+    .post([auth, admin], postItem)
 
   app
     .use(express.json())
     .use(express.urlencoded({ extended: true }))
     .route('/api/items/:id')
     .get(getItem)
-    .put(putItem)
-    .delete(deleteItem)
+    .put([auth, admin], putItem)
+    .delete([auth, admin], deleteItem)
 }
 
 

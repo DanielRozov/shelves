@@ -44,12 +44,14 @@ export async function createItem(req, res) {
  * @apiGroup Item 
  * 
  * @apiParam {Number} id Item unique ID 
+ * 
  * @apiError name is required
  * @apiErrorExample {json} Error-Response:
  *        HTTP/1.1 404 Not Found
  *        {
  *          "error": "This product does not exist."
  *        }
+ * 
  * @apiPermission Only logged in users can put this.
  */
 export async function updateItem(req, res) {
@@ -79,6 +81,7 @@ export async function updateItem(req, res) {
  * @apiGroup Item
  *
  * @apiPermission Only logged in admin can delete this.
+ * 
  * @apiErrorExample {json} Error-Response:
  *     HTTP/1.1 401 Unauthorized
  *     {

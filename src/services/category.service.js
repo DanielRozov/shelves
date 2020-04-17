@@ -7,7 +7,7 @@ import httpStatus from 'http-status'
 
 
 /**
- * @api {post} /api/items
+ * @api {post} /api/items Create a new category
  * @apiName postCategory
  * @apiGroup Category
  * @apiPermission admin
@@ -66,7 +66,7 @@ export async function createCategory(req, res) {
 };
 
 /**
- * @api {put} /api/items/:itemId
+ * @api {put} /api/items/:itemId Update a category
  * @apiName putCategory
  * @apiGroup Category
  * @apiPermission admin
@@ -127,7 +127,7 @@ export async function updateCategory(req, res) {
 };
 
 /**
- * @api {delete} /api/items/:itemId
+ * @api {delete} /api/items/:itemId Delete a category
  * @apiName deleteCategory
  * @apiGroup Category
  * @apiPermission admin

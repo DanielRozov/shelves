@@ -13,7 +13,7 @@ export async function getAllItems() {
 };
 
 /**
- * @api {post} /api/items
+ * @api {post} /api/categories/items
  * @apiName CreateItem
  * @apiGroup Item
  *  
@@ -39,7 +39,7 @@ export async function createItem(req, res) {
 };
 
 /**
- * @api {put} /api/items/:id 
+ * @api {put} /api/categories/items/:id 
  * @apiName UpdateItem
  * @apiGroup Item 
  * 
@@ -76,7 +76,7 @@ export async function updateItem(req, res) {
 };
 
 /**
- * @api {delete} /api/items/:id 
+ * @api {delete} /api/categories/items/:id 
  * @apiName DeleteItem
  * @apiGroup Item
  *
@@ -111,7 +111,7 @@ export async function deleteItemById(req, res) {
 };
 
 /**
- * @api {get} /api/items/:id 
+ * @api {get} /api/categories/items/:id 
  * @apiName GetItem
  * @apiGroup Item
  * @apiPermission Authorized

@@ -1,38 +1,57 @@
-import auth from '../middleware/auth';
 import { Category, validateCategory } from '../models/category';
 import { Item } from '../models/item';
-import asyncMiddleware from '../middleware/async';
-import admin from '../middleware/admin';
 import httpStatus from 'http-status'
 
-
 /**
- * @api {post} /api/items Create a new category
+ * @api {post} /api/items Create a new category.
  * @apiName postCategory
- * @apiGroup Category
+ * @apiGroup Shelves
  * @apiPermission admin
  * 
- * @apiParam {String} name   Category name food/hygiene
- * @apiParam {String} itemId Unique ID of the Item
+ * @apiParam {String} name   Category name food/hygiene.
+ * @apiParam {String} itemId Unique ID of the Item.
  * 
- * @apiError name is required 
- * @apiError itemId is required
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1   200 OK
+ *     {
+ *       "category": {
+ *         "_id": "5e76...*",
+ *         "name": "hygiene",
+ *         "item": {
+ *           "_id": "5e762e...*",
+ *           "name": "deodorant"...
+ *         },
+ *       "__v": 0
+ *       }
+ *     }
  * 
- * @apiError Unauthorized       Access denied. No token provided.
- * @apiError CategoryNotFound   This category does not exists. 
+ * @apiError NameIsRequired       Name is required. 
+ * @apiError ItemIdIsRequired     ItemId is required.
+ * @apiError AccessDenied         Access denied. No token provided.
+ * @apiError TheTokenIsExpiried   The token is expired or invalid.
  * 
  * @apiErrorExample Response (example):
  *     HTTP/1.1 400 Bad Request
  *     {
- *        "status": 400,
- *        "message": "Invalid token."
+ *         "message": "\"name\" is required"
+ *     }
+ * 
+ * @apiErrorExample Response (example):
+ *     HTTP/1.1 400 Bad Request
+ *     {
+ *         "message": "\"itemId\" is required"
  *     }
  * 
  * @apiErrorExample Response (example):
  *     HTTP/1.1 401 Unauthorized
- *     {
- *        "status": 401,
- *        "message": "Access denied. No token provided."
+ *     {  
+ *         "message": "Access denied. No token provided."
+ *     }
+ * 
+ * @apiErrorExample Response (example):
+ *     HTTP/1.1 401 Unauthorized
+ *     {  
+ *         "message": "The token is expired or invalid."
  *     }
  * 
  */
@@ -43,14 +62,14 @@ export async function createCategory(req, res) {
   if (error) {
     return res
       .status(httpStatus.BAD_REQUEST)
-      .json({ status: httpStatus.BAD_REQUEST, message: error.details[0].message });
+      .json({ message: error.details[0].message });
   }
 
   let item = await Item.findById(itemId);
   if (!item) {
     return res
       .status(httpStatus.NOT_FOUND)
-      .json({ status: httpStatus.NOT_FOUND, message: "This category does not exists" });
+      .json({ message: "This category does not exists" });
   }
 
   let category = new Category({
@@ -66,22 +85,51 @@ export async function createCategory(req, res) {
 };
 
 /**
- * @api {put} /api/items/:itemId Update a category
+ * @api {put} /api/items/:itemId Update a category.
  * @apiName putCategory
- * @apiGroup Category
+ * @apiGroup Shelves
  * @apiPermission admin
- *
- * @apiDescription In this case "apiUse" is define and used.
  * 
- * @apiParam {Number} id Unique Item ID to be changed.
- * @apiParam {Number} id Unique Item ID which will replace the previous item.
+ * @apiParam {Number} ItemIdToBeChanged      Unique Item ID to be changed.
+ * @apiParam {Number} ItemIdWichWillReplace  Unique Item ID which will replace the previous item.
  * 
- * @apiError name   is requires
- * @apiError itemId is requires
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1   200 OK
+ *     {
+ *       "category": {
+ *         "_id": "5e763...*",
+ *         "name": "hygiene",
+ *         "item": {
+ *           "_id": "5e762e4...*",
+ *           "name": "deodorant"
+ *         },
+ *       "__v": 0
+ *       },
+ *       "message": "Category updated successfully."
+ *     }
  * 
- * @apiError Unauthorized  Access denied. No token provided.
+ * @apiError ItemIdIsRequired           Item ID required.
+ * @apiError AccesDenied                Access denied. No token provided.
+ * @apiError TokenIsExpiredOrInvalid    The token is expired or invalid.
  * 
- * @apiUse CreateCategoryError
+ * @apiErrorExample Response (example):
+ *     HTTP/1.1 400 Bad Request
+ *     {
+ *         "message": "\"itemId\" is required"
+ *     }
+ * 
+ * @apiErrorExample Response (example):
+ *     HTTP/1.1 401 Unauthorized
+ *     {  
+ *         "message": "Access denied. No token provided."
+ *     }
+ * 
+ * @apiErrorExample Response (example):
+ *     HTTP/1.1 401 Unauthorized
+ *     {  
+ *         "message": "The token is expired or invalid."
+ *     }
+ * 
  */
 export async function updateCategory(req, res) {
   const { 'itemId': itemIdFromParams } = req.params;
@@ -91,21 +139,21 @@ export async function updateCategory(req, res) {
   if (error) {
     return res
       .status(httpStatus.BAD_REQUEST)
-      .json({ status: httpStatus.BAD_REQUEST, message: error.details[0].message });
+      .json({ message: error.details[0].message });
   }
 
-  let categoryFromParams = await SearchCategoryByProductId(itemIdFromParams);
+  let categoryFromParams = await SearchCategoryByItemtId(itemIdFromParams);
   if (!categoryFromParams) {
     return res
       .status(httpStatus.NOT_FOUND)
-      .json({ status: httpStatus.NOT_FOUND, message: 'The category does not exist.' });
+      .json({ message: 'The category does not exist.' });
   }
 
-  let categoryFromBody = await SearchCategoryByProductId(itemId);
+  let categoryFromBody = await SearchCategoryByItemtId(itemId);
   if (!categoryFromBody) {
     return res
       .status(httpStatus.NOT_FOUND)
-      .json({ status: httpStatus.NOT_FOUND, message: 'The category does not exist.' });
+      .json({ message: 'The category does not exist.' });
   }
 
   const item = categoryFromBody.item;
@@ -120,7 +168,7 @@ export async function updateCategory(req, res) {
   if (!categoryFromParams) {
     return res
       .status(httpStatus.NOT_FOUND)
-      .json({ status: httpStatus.NOT_FOUND, message: 'The category does not exist.' });
+      .json({ message: 'The category does not exist.' });
   }
 
   return categoryFromParams;
@@ -129,23 +177,57 @@ export async function updateCategory(req, res) {
 /**
  * @api {delete} /api/items/:itemId Delete a category
  * @apiName deleteCategory
- * @apiGroup Category
+ * @apiGroup Shelves
  * @apiPermission admin
- *
- * @apiDescription In this case "apiUse" is define and used.
  *  
  * @apiParam {Number} id Item unique ID 
  *
- * @apiUse CreateCategoryError
+ * @apiError ItemIdIsRequired           Item ID required.
+ * @apiError AccesDenied                Access denied. No token provided.
+ * @apiError TokenIsExpiredOrInvalid    The token is expired or invalid.
+ * 
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1   202 Accepted
+ *     {
+ *       "category": {
+ *         "_id": "5e763...*",
+ *         "name": "hygiene",
+ *         "item": {
+ *           "_id": "5e762e...",
+ *           "name": "deodorant"
+ *         },
+ *       "__v": 0
+ *       },
+ *       "message": "Category deleted successfully."
+ *     }
+ * 
+ * @apiErrorExample Response (example):
+ *     HTTP/1.1 400 Bad Request
+ *     {
+ *         "message": "\"itemId\" is required"
+ *     }
+ * 
+ * @apiErrorExample Response (example):
+ *     HTTP/1.1 401 Unauthorized
+ *     {  
+ *         "message": "Access denied. No token provided."
+ *     }
+ * 
+ * @apiErrorExample Response (example):
+ *     HTTP/1.1 401 Unauthorized
+ *     {  
+ *         "message": "The token is expired or invalid."
+ *     }
+ *
  */
-export async function deleteCategoryById(req, res) {
+export async function deleteCategoryByItemId(req, res) {
   const { itemId } = req.params;
 
-  let category = await SearchCategoryByProductId(itemId);
+  let category = await SearchCategoryByItemtId(itemId);
   if (!category) {
     return res
       .status(httpStatus.NOT_FOUND)
-      .json({ status: httpStatus.NOT_FOUND, message: 'The item does not exist.' });
+      .json({ message: 'The item does not exist.' });
   }
   category = await Category.findByIdAndRemove(category._id);
 
@@ -157,7 +239,7 @@ export async function deleteCategoryById(req, res) {
 searches for all categories: food and hygiene for a given itemId 
 and returns category
  */
-async function SearchCategoryByProductId(itemId) {
+async function SearchCategoryByItemtId(itemId) {
   const names = await Category.find();
 
   let category;

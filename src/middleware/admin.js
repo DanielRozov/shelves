@@ -4,8 +4,7 @@ export default function (req, res, next) {
   if (!req.user.isAdmin) {
     return res
       .status(httpStatus.FORBIDDEN)
-      .json({ status: httpStatus.FORBIDDEN, message: 'Access denied.' });
+      .json({ message: 'Access denied.' });
   }
-
   next();
 }

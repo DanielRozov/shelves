@@ -7,7 +7,7 @@ export default function (req, res, next) {
   if (!token) {
     return res
       .status(httpStatus.UNAUTHORIZED)
-      .json({ status: httpStatus.UNAUTHORIZED, message: 'Access denied. No token provided.' });
+      .json({ message: 'Access denied. No token provided.' });
   }
 
   try {
@@ -16,7 +16,7 @@ export default function (req, res, next) {
     next();
   } catch (ex) {
     res
-      .status(httpStatus.BAD_REQUEST)
-      .json({ status: httpStatus.BAD_REQUEST, message: 'Invalid token' });
+      .status(httpStatus.UNAUTHORIZED)
+      .json({ message: 'The token is expired or invalid.' });
   }
 }

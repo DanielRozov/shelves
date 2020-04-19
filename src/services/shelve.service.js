@@ -1,50 +1,112 @@
-import express from 'express';
 import { Category } from '../models/category';
 import httpStatus from 'http-status'
-
-const router = express.Router();
 
 /* This endpoint is wrapped using an asyncMiddleware function 
 to catch an error instead of try-catch block for experiment purposes.*/
 
 /**
-* @api {get} /api/shelves Provides information about items belonging to all categories.
+* @api {get} /api/shelves/categories Get the Shelves information.
 * @apiName GetCategories
-* @apiGroup Category
-* @apiPermission none
+* @apiGroup Shelves
+* @apiPermission user
 *
-*
-*
+* @apiSuccessExample {json} Success-Response:
+*     HTTP/1.1 200 OK
+* {
+*   "shelves": {
+*     "food": {
+*       "items": 8,
+*       "categories": [
+*           "drinks"...     
+*       ]
+*   },
+*   "hygiene": {
+*     "items": 5,
+*     "categories": [
+*      "deodorant"...            
+*      ]
+*    }
+*  }
+* }
 */
 export async function getAllCategories(req, res) {
-  const categories = await Category.find();
-  if (categories.length === 0) {
-    return res
-      .status(httpStatus.NOT_FOUND)
-      .json({ status: httpStatus.NOT_FOUND, message: 'The category does not exist.' });
+  const shelves = {
+    food: {
+      items: 0,
+      categories: []
+    },
+    hygiene: {
+      items: 0,
+      categories: []
+    }
   }
-  return categories;
+
+  const foodCategories = await Category
+    .find({ 'name': 'food' })
+
+  foodCategories.forEach(element => shelves.food.categories.push(element.item.name));
+  shelves.food.items = shelves.food.categories.length;
+
+  const hygieneCategories = await Category
+    .find({ 'name': 'hygiene' })
+
+  hygieneCategories.forEach(element => shelves.hygiene.categories.push(element.item.name));
+  shelves.hygiene.items = shelves.hygiene.categories.length;
+
+  return shelves;
 };
 
+
 /**
- * @api {get} /categories/:categoryName   Provides information about items belonging to a certain category(food or hygiene).
+ * @api {get} /api/shelves/categories/:categoryName   Get a category information.
  * @apiName getCategory
- * @apiGroup Category
+ * @apiGroup Shelves
  * @apiPermission none
  * 
- * @apiParam {String} categoryName: food or hygiene
+ * @apiParam {String} categoryName: food or hygiene. 
  * 
- * @apiError CategoryWasNotFound   The given category was not found. 
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ * {
+ *   "items": 8,
+ *   "categories": [
+ *       "drinks",
+ *       "fish"...
+ *   ]
+ * }
+ * 
+ * @apiError  CategoryWasNotFound   The given category was not found.
+ * @apiError  AccessDenied          Access denied. No token provided.
+ * @apiError  TheTokenIsExpiried    The token is expired or invalid.
+ * @apiDefine NotFound              This category does not exist.
+ * 
+ * @apiErrorExample {json} Error-Response:
+ *        HTTP/1.1 404 Not Found
+ *        { 
+ *             "message": "This category does not exist."
+ *        }
+ * 
+ * @apiErrorExample {json} Error-Response:
+ *        HTTP/1.1   401 Unauthorized
+ *        {
+ *             "message": "Access denied. No token provided."
+ *        }
+ * 
+ * * @apiErrorExample {json} Error-Response:
+ *        HTTP/1.1   401 Unauthorized
+ *        {
+ *             "message": "The token is expired or invalid."
+ *        }
  */
 export async function getItemsByCategoryName(req, res) {
   const { categoryName } = req.params;
 
-  let items = [];
+  const items = [];
   const category = await Category.find({ name: categoryName });
   if (!category || category.length === 0) {
     return res
       .status(httpStatus.NOT_FOUND)
-      .json({ status: httpStatus.NOT_FOUND, message: 'The given category was not found.' });
+      .json({ message: 'This category does non exist.' });
   }
 
   category.forEach((value) => {
@@ -55,27 +117,37 @@ export async function getItemsByCategoryName(req, res) {
 };
 
 /**
- * @api {get} /categories/:categoryName/:itemName Provides information about items of the same category and with the same name.
+ * @api {get} /api/shelves/categories/:categoryName/:itemName  Get an item information.
  * @apiName getCategoryItems
- * @apiGroup Category
+ * @apiGroup Shelves
  * @apiPermission none
  * 
- * @apiParam {String} categoryName: food or hygiene
- * @apiParam {String} itemName
+ * @apiParam {String} categoryName Mandatory food or hygiene.
+ * @apiParam {String} itemName     Mandatory name of the Item. 
  * 
- * @apiError CategoryWasNotFound   The given category was not found. 
- * @apiError ItemWasNotFound   The given item was not found. 
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ * {
+ *   "items": 2,
+ *   "products": [
+ *      "aftershave"...
+ *   ]
+ * }
+ * 
+ * @apiError ItemNotFound       This item does not exist.  
+ * @apiError CategoryNotFound   This category does not exist. 
+ * 
+ * 
  */
 export async function getItemsByCategoryNameAndItemName(req, res) {
   const { categoryName, itemName } = req.params;
 
-  let items = [];
-
+  const items = [];
   const category = await Category.find({ name: categoryName });
   if (!category) {
     return res
       .status(httpStatus.NOT_FOUND)
-      .json({ status: httpStatus.NOT_FOUND, message: 'The given category was not found' });
+      .json({ message: 'This category does not exist.' });
   }
 
   for (const product of category) {
@@ -87,9 +159,7 @@ export async function getItemsByCategoryNameAndItemName(req, res) {
   if (items.length === 0) {
     return res
       .status(httpStatus.NOT_FOUND)
-      .json({ status: httpStatus.NOT_FOUND, message: 'The given item does not exist' });
+      .json({ message: 'This item does not exist' });
   }
   return items;
 };
-
-export default router;

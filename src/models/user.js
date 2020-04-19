@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import Joi, { bool, boolean } from 'joi';
-import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt';
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -30,11 +30,6 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-// userSchema.methods.generateAuthToken = function() {
-//   const token = jwt.sign({ _id: this._id }, config.get('jwtPrivateKey'), { expiresIn: '1h' });
-//   return token;
-// }
-
 function validateUser(user) {
   const schema = {
     username: Joi.string().min(5).max(50).required(),
@@ -46,6 +41,11 @@ function validateUser(user) {
   return Joi.validate(user, schema);
 }
 
+async function generateHashPassword(password) {
+  const salt = await bcrypt.genSalt(10);
+  password = await bcrypt.hash(password, salt);
+  return password;
+}
 // export default function (user) {
 //   const schema = Joi.object({
 //     username: Joi.string()
@@ -63,4 +63,4 @@ function validateUser(user) {
 //   schema.validate({ user, schema });
 // }
 
-export { userSchema, User, validateUser };
+export { userSchema, User, validateUser, generateHashPassword };

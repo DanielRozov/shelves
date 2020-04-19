@@ -4,44 +4,45 @@ import asyncMiddleware from '../middleware/async'
 
 const getCategories = asyncMiddleware(async (req, res) => {
   try {
-    const categories = await getAllCategories(req, res);
-    return res
-      .status(httpStatus.OK)
-      .json({ status: httpStatus.OK, categories: categories, message: 'Categories retrived successfully.' })
+    let shelves = await getAllCategories(req, res);
+    shelves.food.categories = uniqueArray(shelves.food.categories);
+    shelves.hygiene.categories = uniqueArray(shelves.hygiene.categories);
+
+    return res.json({ shelves })
   } catch (e) {
-    return res
-      .status(httpStatus.BAD_REQUEST)
-      .json({ status: httpStatus.BAD_REQUEST, message: e.message });
+    return res.status(httpStatus.BAD_REQUEST).json({ message: e.message });
   }
 });
 
 const getItemsByCategory = asyncMiddleware(async (req, res) => {
   try {
-    const categories = await getItemsByCategoryName(req, res);
+    let categories = await getItemsByCategoryName(req, res);
     const items = categories.length;
-    return res
-      .status(httpStatus.OK)
-      .json({ status: httpStatus.OK, items: items, categories: categories, message: 'Categories retrived successfully.' })
+    categories = uniqueArray(categories);
+
+    return res.json({ items, categories })
   } catch (e) {
-    return res
-      .status(httpStatus.BAD_REQUEST)
-      .json({ status: httpStatus.BAD_REQUEST, message: e.message });
+    return res.status(httpStatus.BAD_REQUEST).json({ message: e.message });
   }
 });
 
 const getItemsByCategoryAndItem = asyncMiddleware(async (req, res) => {
   try {
-    const categories = await getItemsByCategoryNameAndItemName(req, res);
-    const items = categories.length;
-    return res
-      .status(httpStatus.OK)
-      .json({ status: httpStatus.OK, items: items, categories: categories, message: 'Categories retrived successfully.' })
+    let products = await getItemsByCategoryNameAndItemName(req, res);
+    const items = products.length;
+    products = uniqueArray(products);
+
+    return res.json({ items, products });
   } catch (e) {
-    return res
-      .status(httpStatus.BAD_REQUEST)
-      .json({ status: httpStatus.BAD_REQUEST, message: e.message });
+    return res.status(httpStatus.BAD_REQUEST).json({ message: e.message });
   }
 });
+
+function uniqueArray(oldArray) {
+  let uniqueArray = new Set();
+  oldArray.forEach(element => uniqueArray.add(element));
+  return uniqueArray;
+}
 
 export {
   getCategories,

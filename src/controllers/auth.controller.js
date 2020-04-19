@@ -5,13 +5,9 @@ import asyncMiddleware from '../middleware/async'
 const postUser = asyncMiddleware(async (req, res) => {
   try {
     const token = await authentcateUser(req, res);
-    return res
-      .status(httpStatus.ACCEPTED)
-      .json({ status: httpStatus.ACCEPTED, token: token, message: 'Successfully authenticated' })
+    return res.status(httpStatus.ACCEPTED).json({token});
   } catch (e) {
-    return res
-      .status(status.INTERNAL_SERVER_ERROR)
-      .json({ status: status.INTERNAL_SERVER_ERROR, message: e.message });
+    return res.status(status.INTERNAL_SERVER_ERROR).json({message: e.message });
   }
 });
 

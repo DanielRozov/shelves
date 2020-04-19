@@ -4,14 +4,12 @@ import asyncMiddleware from '../middleware/async';
 
 const getItems = asyncMiddleware(async (req, res) => {
   try {
-    const items = await getAllItems();
-    return res
-      .status(httpStatus.OK)
-      .json({ status: httpStatus.OK, items: items, message: "Succesfully Items Retrieved" });
+    const categories = await getAllItems();
+    return res.json({ items: categories.length, categories });
   } catch (e) {
     return res
       .status(httpStatus.BAD_REQUEST)
-      .json({ status: httpStatus.BAD_REQUEST, message: e.message });
+      .json({ message: e.message });
   }
 });
 
@@ -24,7 +22,7 @@ const postItem = asyncMiddleware(async (req, res) => {
   } catch (e) {
     return res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ status: httpStatus.INTERNAL_SERVER_ERROR, message: e.message });
+      .json({ message: e.message });
   }
 });
 
@@ -38,20 +36,18 @@ const putItem = asyncMiddleware(async (req, res) => {
   } catch (e) {
     return res
       .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ status: httpStatus.INTERNAL_SERVER_ERROR, message: e.message });
+      .json({ message: e.message });
   }
 });
 
 const getItem = asyncMiddleware(async (req, res) => {
   try {
     const item = await getItemById(req, res);
-    return res
-      .status(httpStatus.OK)
-      .json({ status: httpStatus.OK, item: item, message: "Item successfully retrived." });
+    return res.json({ item: item, message: "Item successfully retrived." });
   } catch (e) {
     return res
       .status(httpStatus.BAD_REQUEST)
-      .json({ status: httpStatus.BAD_REQUEST, message: e.message });
+      .json({ message: e.message });
   }
 });
 
@@ -64,7 +60,7 @@ const deleteItem = asyncMiddleware(async (req, res) => {
   } catch (e) {
     return res
       .status(httpStatus.BAD_REQUEST)
-      .json({ status: httpStatus.BAD_REQUEST, message: e.message });
+      .json({ message: e.message });
   }
 });
 

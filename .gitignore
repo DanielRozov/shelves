@@ -1,2 +1,18 @@
+# Apidoc
+apidoc/
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+coverage/
+
+# Dependency directory
 node_modules/
+
 *.txt

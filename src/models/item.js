@@ -13,7 +13,7 @@ const itemSchema = new mongoose.Schema({
 
 const Item = mongoose.model('Item', itemSchema);
 
-export function validateItem(item) {
+export default function (item) {
   const schema = {
     name: Joi.string().min(3).max(50).required()
   }

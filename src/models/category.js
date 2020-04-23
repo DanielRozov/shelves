@@ -1,4 +1,6 @@
 import Joi from 'joi';
+import JoiObjectId from 'joi-objectid';
+const myObjectId = JoiObjectId(Joi);
 import mongoose from 'mongoose';
 import { itemSchema } from './item';
 
@@ -21,7 +23,7 @@ const Category = mongoose.model('Category', categorySchema);
 export function validateCategory(category) {
   const schema = {
     name: Joi.string().min(4).max(255).required(),
-    itemId: Joi.required()
+    itemId: myObjectId().required()
   }
 
   return Joi.validate(category, schema);
